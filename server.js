@@ -4,8 +4,6 @@ const bcrypt = require('bcrypt-nodejs')
 const cors = require('cors');
 const knex = require('knex');
 
-const app = express();
-
 const db = knex({
     client: 'pg',
     connection: {
@@ -16,29 +14,30 @@ const db = knex({
     }
   });
 
-const database = {
-    users: [
-        {
-            id: '123',
-            name: 'username',
-            email: 'username@email.com',
-            password: 'nameofmydog',
-            entries: 0,
-            joined: new Date()
-        },
-        {
-            id: '124',
-            name: 'username2',
-            email: 'username2@email.com',
-            password: 'nameofmycat',
-            entries: 0,
-            joined: new Date()
-        }
-    ]
-}
+const app = express();
+// const database = {
+//     users: [
+//         {
+//             id: '123',
+//             name: 'username',
+//             email: 'username@email.com',
+//             password: 'nameofmydog',
+//             entries: 0,
+//             joined: new Date()
+//         },
+//         {
+//             id: '124',
+//             name: 'username2',
+//             email: 'username2@email.com',
+//             password: 'nameofmycat',
+//             entries: 0,
+//             joined: new Date()
+//         }
+//     ]
+// }
 
-app.use(bodyParser.json())
-app.use(cors())
+app.use(bodyParser.json());
+app.use(cors());
 
 app.get('/', (req, res)=> {
     res.send(database.users);
@@ -59,13 +58,12 @@ app.post('/signin',(req, res)=> {
         }else{
             res.status(400).json('wrong credentials')
         }
-        
       })
      .catch(err => res.status(400).json('wrong credentials'))
 })
 
 app.post('/register',(req, res)=> {
-    const { name, email } = req.body;
+    const { name, email, password } = req.body;
     const hash =  bcrypt.hashSync(password);
         db.transaction(trx => {
             trx.insert({
@@ -82,7 +80,7 @@ app.post('/register',(req, res)=> {
                         name: name,
                         joined : new Date()
                         })
-                        .then(response =>{
+                        .then(user =>{
                             res.json(user[0]);
                         })
                     })
